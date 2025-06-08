@@ -21,10 +21,39 @@
                 <a href="#" class="text-white hover:underline">Pricing</a>
             </div>
 
-            <!-- Kanan: Login -->
-            <div class="hidden md:block">
+            @auth
+            <div class="hidden md:block relative">
+                <button id="user-menu-button" class="text-white focus:outline-none focus:ring-2 focus:ring-white">
+                    welcome, {{ auth()->user()->name }}
+                    <!-- Icon: user -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 11a4 4 0 11-8 0 4 4 0 018 0zM12 14a7.002 7.002 0 00-6.32 4.5A9.003 9.003 0 0112 21a9.003 9.003 0 016.32-2.5A7.002 7.002 0 0012 14z"></path>
+                    </svg>
+                </button>
+                <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">Logout</button>
+                    </form>
+                </div>
+                <script>
+                    document.getElementById('user-menu-button').addEventListener('click', function() {
+                        const menu = document.getElementById('user-menu');
+                        menu.classList.toggle('hidden');
+                    });
+                </script>
+            </div>
+                @else
+                <div class="hidden md:block">
                 <a href="{{ route('login') }}" class="text-white hover:underline">Login</a>
             </div>
+            @endauth
+            <!-- Kanan: Login -->
 
             <!-- Mobile menu button -->
             <div class="md:hidden">

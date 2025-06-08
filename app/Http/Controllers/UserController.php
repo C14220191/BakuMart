@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Contracts\Support\ValidatedData;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -75,5 +76,29 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function authenticate(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email:dns',
+            'password' => 'required|min:5',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/home');
+        }
+
+        return back()->with([
+            'error' => 'The provided credentials do not match our records.',
+        ]);
+    }
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login')->with('success', 'You have been logged out successfully.');
     }
 }

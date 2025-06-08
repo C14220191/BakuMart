@@ -11,9 +11,12 @@ Route::get('/', function () {
 Route::resource('home', ProductController::class);
 Route::get('/login', function () {
     return view('login');
-})->name('login');
+})->name('login')->middleware('guest');
+
+Route::post('/login', [UserController::class, 'authenticate'])->name('login');
 Route::get('/register', function () {
     return view('register');
 })->name('register');
-Route::post('/register', [UserController::class, 'store'])->name('register');
 
+Route::post('/register', [UserController::class, 'store'])->name('register');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');
