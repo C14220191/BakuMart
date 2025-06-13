@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->integer('total_price');
-            $table->string('status')->default('pending'); // pending, completed, cancelled
-            $table->string('payment_method')->default('cash'); // cash, card, online
+            $table->foreignId('user_id')->constrained('users');
+            $table->date('order_date');
+            $table->string('status')->default('Pending');
+            $table->decimal('total', 10, 2);
+            $table->string('payment_method')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

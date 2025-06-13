@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -24,6 +25,7 @@ class ProductController extends Controller
     public function create()
     {
         //
+        return view('products.form');
     }
 
     /**
@@ -32,6 +34,34 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $name = $request->name;
+        $description = $request->description;
+        $price = $request->price;
+        $stock = $request->stock;
+        //if image is null, set it to a default image ('dummy.pnp')
+        $imagePath = $request->hasFile('image')
+            ? $request->file('image')->store('images/products', 'public')
+            : 'images/products/dummy.png';
+
+        $adminId = Auth::user()->id;
+        Product::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'image' => $imagePath,
+            'admin_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('products.index')->with('success', 'Product created successfully');
     }
 
     /**

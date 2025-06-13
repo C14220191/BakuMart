@@ -15,14 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price');
-            $table->integer('stock')->default(0);
-            $table->string('image')->default('dummy.png');
-            $table->timestamp('deleted_at')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->integer('stock');
+            $table->string('image')->default('images/products/dummy.png');
+            $table->foreignId('admin_id')->constrained('users');
             $table->timestamps();
+            $table->softDeletes();
         });
-
-        
     }
 
     /**
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('products');
     }
 };

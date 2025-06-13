@@ -20,8 +20,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'phone',
         'password',
+        'phone',
+        'role',
     ];
 
     /**
@@ -33,6 +34,21 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'admin_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // Cek apakah user adalah admin
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 
     /**
      * Get the attributes that should be cast.
