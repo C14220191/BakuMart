@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -87,5 +89,35 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //
+    }
+    public function ajaxList(Request $request)
+    {
+        Log::info('AJAX dipanggil', ['search' => $request->search]);
+
+        $query = Product::query();
+
+        if ($request->has('search') && !empty($request->search)) {
+            $search = strtolower($request->search);
+            $query->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+        }
+
+
+        $products = $query->paginate(15);
+
+        $products->getCollection()->transform(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'stock' => $product->stock,
+                'price' => number_format($product->price, 0, ',', '.'),
+                'image_url' => asset('storage/' . $product->image),
+            ];
+        });
+
+        return response()->json([
+            'products' => $products->items(),
+            'pagination' => (string) $products->appends(['search' => $request->search])->links(),
+        ]);
     }
 }

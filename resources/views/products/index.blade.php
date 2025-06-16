@@ -1,80 +1,229 @@
 @extends('base.base')
 
-
 @section('content')
     @include('base.navbar')
-    <h1 class="container justify-center ml-28 text-2xl font-bold">All Product</h1>
-    <div class="flex justify-center mt-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 max-w-screen-xl">
-            @foreach ($listProducts->take(15) as $product)
-                <div onclick="showProductModal('{{ asset('storage/' . $product->image) }}', '{{ $product->name }}', `{{ $product->description }}`, '{{ $product->stock }}', '{{ $product->price }}')"
-                    class="cursor-pointer bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition">
-
-                    <!--placeholder img -->
-                    <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/100' }}" alt="product image"
-
-
-                    <div class="px-5 pb-5">
-
-                        <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                            {{ $product->name }}</h5>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 truncate">{{ $product->description }}
-                        </p>
-
-                        <div class="mt-2 text-sm text-gray-800 dark:text-gray-300 w-fit">
-                            {{ $product->stock }} in stock
-                        </div>
-                        <div class="mt-3 flex flex-wrap items-center gap-2">
-                            <span class="text-xl font-bold text-gray-900 dark:text-white w-fit">Rp.
-                                {{ $product->price }}</span>
-                            <a href="#"
-                                class="inline-flex w-fit text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add
-                                to cart</a>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-            <!-- Modal -->
-            <div id="productModal" onclick="closeModalOnBackground(event)"
-                class="fixed inset-0 z-50 hidden bg-white/30 backdrop-blur-sm overflow-y-auto">
-
-                <div class="relative p-4 w-full max-w-md mx-auto">
-                    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
-                        <button onclick="closeModal()"
-                            class="absolute top-2 right-2 text-gray-500 hover:text-gray-900">&times;</button>
-                        <img id="modalImage" class="w-full h-48 object-cover rounded mb-4" src=""
-                            alt="Product Image">
-                        <h2 id="modalName" class="text-xl font-bold text-gray-800 dark:text-white mb-2"></h2>
-                        <p id="modalDescription" class="text-sm text-gray-700 dark:text-gray-300 mb-2"></p>
-                        <div id="modalStock" class="text-sm text-gray-800 dark:text-gray-300 mb-1"></div>
-                        <div id="modalPrice" class="text-lg font-semibold text-gray-900 dark:text-white mb-3"></div>
-                        <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Add to cart</button>
-                    </div>
-                </div>
+    <div class="w-full max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold">All Product</h1>
+            <div class="flex items-center gap-4">
+                <input type="text" id="searchInput" placeholder="Search products..."
+                    class="border px-3 py-2 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="toggleCart()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    🛒 Cart (<span id="cartCount">0</span>)
+                </button>
             </div>
+        </div>
 
+        <div id="productContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 justify-center">
+        </div>
+
+        <div id="paginationContainer" class="flex justify-center mt-6 space-x-2">
+            {{-- Link pagination muncul lewat AJAX --}}
+        </div>
+    </div>
+
+    {{-- Floating Cart --}}
+    <div id="cartFloating"
+        class="fixed right-4 bottom-4 w-80 bg-white shadow-lg rounded-lg p-4 border z-50 max-h-[500px] overflow-y-auto hidden">
+        <h3 class="text-lg font-bold mb-2">Your Cart</h3>
+        <ul id="cartList" class="space-y-3">
+            <li class="text-gray-500">Cart is empty</li>
+        </ul>
+        <div class="mt-4 text-right font-semibold text-lg" id="cartTotal">Total: Rp 0</div>
+        <button onclick="checkoutCart()"
+            class="mt-2 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Checkout</button>
+    </div>
+
+    {{-- Modal --}}
+    <div id="productModal" onclick="closeModalOnBackground(event)"
+        class="fixed inset-0 z-50 hidden bg-white/30 backdrop-blur-sm overflow-y-auto">
+        <div class="relative p-4 w-full max-w-md mx-auto">
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+                <button onclick="closeModal()"
+                    class="absolute top-2 right-2 text-gray-500 hover:text-gray-900">&times;</button>
+                <img id="modalImage" class="w-full h-48 object-cover rounded mb-4" src="" alt="Product Image">
+                <h2 id="modalName" class="text-xl font-bold text-gray-800 dark:text-white mb-2"></h2>
+                <p id="modalDescription" class="text-sm text-gray-700 dark:text-gray-300 mb-2"></p>
+                <div id="modalStock" class="text-sm text-gray-800 dark:text-gray-300 mb-1"></div>
+                <div id="modalPrice" class="text-lg font-semibold text-gray-900 dark:text-white mb-3"></div>
+                <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Add to cart</button>
+            </div>
         </div>
     </div>
 @endsection
 
-<script>
-    function showProductModal(image, name, description, stock, price) {
-        document.getElementById('modalImage').src = image;
-        document.getElementById('modalName').textContent = name;
-        document.getElementById('modalDescription').textContent = description;
-        document.getElementById('modalStock').textContent = `${stock} in stock`;
-        document.getElementById('modalPrice').textContent = `Rp. ${price}`;
-        document.getElementById('productModal').classList.remove('hidden');
-    }
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const isLoggedIn = @json(auth()->check());
+        let cartItems = [];
 
-    function closeModal() {
-        document.getElementById('productModal').classList.add('hidden');
-    }
-
-    function closeModalOnBackground(event) {
-        const modalContent = event.target.closest('.modal-content');
-        if (!modalContent) {
-            closeModal();
+        function showProductModal(image, name, description, stock, price) {
+            document.getElementById('modalImage').src = image;
+            document.getElementById('modalName').textContent = name;
+            document.getElementById('modalDescription').textContent = description;
+            document.getElementById('modalStock').textContent = `${stock} in stock`;
+            document.getElementById('modalPrice').textContent = `Rp. ${price}`;
+            document.getElementById('productModal').classList.remove('hidden');
         }
-    }
-</script>
+
+        function closeModal() {
+            document.getElementById('productModal').classList.add('hidden');
+        }
+
+        function closeModalOnBackground(event) {
+            const modalContent = event.target.closest('.modal-content');
+            if (!modalContent) {
+                closeModal();
+            }
+        }
+
+        function addToCart(product) {
+            if (!isLoggedIn) {
+                window.location.href = "{{ route('login') }}";
+                return;
+            }
+
+            const exists = cartItems.find(p => p.id === product.id);
+            if (exists) {
+                alert("Product already in cart.");
+                return;
+            }
+
+            product.qty = 1;
+            cartItems.push(product);
+            renderCart();
+        }
+
+        function removeFromCart(id) {
+            cartItems = cartItems.filter(item => item.id !== id);
+            renderCart();
+        }
+
+        function updateQty(id, newQty) {
+            const item = cartItems.find(i => i.id === id);
+            if (item) {
+                const maxStock = parseInt(item.stock);
+                if (newQty < 1 || newQty > maxStock) {
+                    alert(`Quantity must be between 1 and ${maxStock}`);
+                    return;
+                }
+                item.qty = newQty;
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cartList');
+            const count = document.getElementById('cartCount');
+            const totalContainer = document.getElementById('cartTotal');
+
+            count.textContent = cartItems.length;
+
+            list.innerHTML = '';
+            let total = 0;
+
+            if (cartItems.length === 0) {
+                list.innerHTML = '<li class="text-gray-500">Cart is empty</li>';
+                totalContainer.textContent = "Total: Rp 0";
+                return;
+            }
+
+            cartItems.forEach(item => {
+                const subtotal = item.qty * item.price;
+                total += subtotal;
+
+                const li = document.createElement('li');
+                li.className = 'flex flex-col bg-gray-50 rounded p-2 border';
+
+                li.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-semibold text-sm">${item.name}</span>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 text-sm hover:underline">Remove</button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm">Qty:</label>
+                        <input type="number" min="1" max="${item.stock}" value="${item.qty}"
+                            onchange="updateQty(${item.id}, this.value)"
+                            class="w-16 border px-2 py-1 rounded text-sm">
+                        <span class="text-sm text-gray-700 ml-auto whitespace-nowrap">Rp ${subtotal}</span>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+
+            totalContainer.textContent = `Total: Rp ${total}`;
+        }
+
+        function toggleCart() {
+            const cart = document.getElementById('cartFloating');
+            cart.classList.toggle('hidden');
+        }
+
+        function checkoutCart() {
+            if (cartItems.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            let summary = "Checkout Items:\n";
+            let total = 0;
+            cartItems.forEach(item => {
+                summary += `- ${item.name} x ${item.qty} = Rp ${item.qty * item.price}\n`;
+                total += item.qty * item.price;
+            });
+            summary += `\nTotal: Rp ${total}`;
+            alert(summary);
+
+            cartItems = [];
+            renderCart();
+            toggleCart();
+        }
+
+        $(document).ready(function () {
+            function loadProducts(page = 1, search = '') {
+                $.get("{{ route('products.ajaxList') }}", { page, search }, function (data) {
+                    const container = $('#productContainer');
+                    container.empty();
+
+                    data.products.forEach(product => {
+                        container.append(`
+                            <div onclick="showProductModal('${product.image_url}', '${product.name}', '${product.description}', '${product.stock}', '${product.price}')"
+                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer">
+                                <img src="${product.image_url}" alt="product image"
+                                    class="w-24 h-24 object-cover mx-auto mt-4 rounded" />
+                                <div class="px-5 pb-5">
+                                    <h5 class="text-xl font-semibold text-gray-900">${product.name}</h5>
+                                    <p class="mt-2 text-sm text-gray-600 truncate">${product.description}</p>
+                                    <div class="mt-2 text-sm text-gray-800">${product.stock} in stock</div>
+                                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                                        <span class="text-xl font-bold text-gray-900">Rp. ${product.price}</span>
+                                        <button onclick='event.stopPropagation(); addToCart(${JSON.stringify(product)})'
+                                            class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5">Add to cart</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+
+                    $('#paginationContainer').html(data.pagination);
+                });
+            }
+
+            loadProducts();
+
+            $('#searchInput').on('input', function () {
+                const query = $(this).val();
+                loadProducts(1, query);
+            });
+
+            $(document).on('click', '#paginationContainer a', function (e) {
+                e.preventDefault();
+                const url = new URL($(this).attr('href'));
+                const page = url.searchParams.get("page");
+                const search = $('#searchInput').val();
+                loadProducts(page, search);
+            });
+        });
+    </script>
+@endpush

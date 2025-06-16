@@ -6,8 +6,7 @@ use App\Http\Controllers\UserController;
 
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
-Route::get('/', [ProductController::class, 'index']);
-
+Route::get('/products/list', [ProductController::class, 'ajaxList'])->name('products.ajaxList');
 
 Route::get('/login', fn() => view('login'))->name('login');
 Route::post('/login', [UserController::class, 'authenticate'])->name('login');
@@ -15,20 +14,9 @@ Route::post('/login', [UserController::class, 'authenticate'])->name('login');
 Route::get('/register', fn() => view('register'))->name('register');
 Route::post('/register', [UserController::class, 'store'])->name('register');
 
+
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
-
-Route::get('/', function () {
-    return view('base.home');
-});
-
-Route::get('/features', function () {
-    return view('base.features');
-});
-
-Route::get('/pricing', function () {
-    return view('base.pricing');
-});
 
 
     Route::middleware(['role:admin'])->group(function () {
