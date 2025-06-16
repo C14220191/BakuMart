@@ -16,9 +16,10 @@
 
             <!-- Tengah (untuk menu desktop) -->
             <div class="hidden md:flex space-x-6">
-                <a href="#" class="text-white hover:underline">Home</a>
-                <a href="#" class="text-white hover:underline">Features</a>
-                <a href="#" class="text-white hover:underline">Pricing</a>
+                <a href="/" class="hover:underline">Home</a>
+                <a href="/features" class="hover:underline">Features</a>
+                <a href="/pricing" class="hover:underline">Pricing</a>
+                
             </div>
 
             @auth

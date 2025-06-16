@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $listProducts = Product::all();
@@ -18,10 +15,6 @@ class ProductController extends Controller
             'listProducts' => $listProducts,
         ]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //

@@ -1,5 +1,6 @@
 @extends('base.base')
 
+
 @section('content')
     @include('base.navbar')
     <h1 class="container justify-center ml-28 text-2xl font-bold">All Product</h1>
@@ -9,8 +10,9 @@
                 <div onclick="showProductModal('{{ asset('storage/' . $product->image) }}', '{{ $product->name }}', `{{ $product->description }}`, '{{ $product->stock }}', '{{ $product->price }}')"
                     class="cursor-pointer bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-md transition">
 
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="product image"
-                        class="w-24 h-24 object-cover mx-auto mt-4 rounded" />
+                    <!--placeholder img -->
+                    <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/100' }}" alt="product image"
+
 
                     <div class="px-5 pb-5">
 
@@ -54,6 +56,7 @@
         </div>
     </div>
 @endsection
+
 <script>
     function showProductModal(image, name, description, stock, price) {
         document.getElementById('modalImage').src = image;
