@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Models\OrderItem;
+use App\Models\Product;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -28,8 +33,41 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.id' => 'required|exists:products,id',
+            'items.*.qty' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+        ]);
+        $total = collect($request->items)->sum(function ($item) {
+            return $item['price'] * $item['qty'];
+        });
+        $order = Order::create([
+            'user_id' => Auth::user()->id,
+            'order_date' => Carbon::now()->toDateString(),
+            'status' => 'pending',
+            'total' => $total,
+        ]);
+        $orderItems = collect($request->items)->map(function ($item) use ($order) {
+            return [
+                'order_id' => $order->id,
+                'product_id' => $item['id'],
+                'quantity' => $item['qty'],
+                'price' => $item['price'],
+            ];
+        })->toArray();
+        OrderItem::insert($orderItems);
+        // Update product stock
+        foreach ($request->items as $item) {
+            $product = Product::find($item['id']);
+            $product->decrement('stock', $item['qty']);
+        }
+        return response()->json([
+            'success' => true,
+            'redirect' => route('payment.index'),
+        ]);
+    }   
 
     /**
      * Display the specified resource.

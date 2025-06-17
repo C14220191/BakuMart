@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderItemController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
@@ -17,12 +19,14 @@ Route::post('/register', [UserController::class, 'store'])->name('register');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
-
-
+    Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+    Route::get('/payment', [OrderItemController::class, 'index'])->name('payment.index');
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/form', [ProductController::class, 'create'])->name('products.create');
         Route::post('/form', [ProductController::class, 'store'])->name('products.store');
     });
 
     Route::resource('products', ProductController::class)->except(['create', 'store']);
+
+
 });

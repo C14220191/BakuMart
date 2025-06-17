@@ -36,11 +36,6 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
-
-        $name = $request->name;
-        $description = $request->description;
-        $price = $request->price;
-        $stock = $request->stock;
         //if image is null, set it to a default image ('dummy.pnp')
         $imagePath = $request->hasFile('image')
             ? $request->file('image')->store('images/products', 'public')
@@ -53,7 +48,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock' => $request->stock,
             'image' => $imagePath,
-            'admin_id' => Auth::id(),
+            'admin_id' => $adminId,
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully');

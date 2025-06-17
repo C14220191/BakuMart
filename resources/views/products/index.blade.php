@@ -161,28 +161,49 @@
         }
 
         function checkoutCart() {
+            if (!isLoggedIn) {
+                window.location.href = "{{ route('login') }}";
+                return;
+            }
+
             if (cartItems.length === 0) {
                 alert("Your cart is empty!");
                 return;
             }
 
-            let summary = "Checkout Items:\n";
-            let total = 0;
-            cartItems.forEach(item => {
-                summary += `- ${item.name} x ${item.qty} = Rp ${item.qty * item.price}\n`;
-                total += item.qty * item.price;
-            });
-            summary += `\nTotal: Rp ${total}`;
-            alert(summary);
-
-            cartItems = [];
-            renderCart();
-            toggleCart();
+            fetch("{{ route('checkout.store') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        items: cartItems
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        cartItems = [];
+                        renderCart();
+                        window.location.href = data.redirect;
+                    } else {
+                        alert("Checkout failed.");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Error processing checkout.");
+                });
         }
 
-        $(document).ready(function () {
+
+        $(document).ready(function() {
             function loadProducts(page = 1, search = '') {
-                $.get("{{ route('products.ajaxList') }}", { page, search }, function (data) {
+                $.get("{{ route('products.ajaxList') }}", {
+                    page,
+                    search
+                }, function(data) {
                     const container = $('#productContainer');
                     container.empty();
 
@@ -212,12 +233,12 @@
 
             loadProducts();
 
-            $('#searchInput').on('input', function () {
+            $('#searchInput').on('input', function() {
                 const query = $(this).val();
                 loadProducts(1, query);
             });
 
-            $(document).on('click', '#paginationContainer a', function (e) {
+            $(document).on('click', '#paginationContainer a', function(e) {
                 e.preventDefault();
                 const url = new URL($(this).attr('href'));
                 const page = url.searchParams.get("page");
