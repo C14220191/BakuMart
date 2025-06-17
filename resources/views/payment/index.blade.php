@@ -1,6 +1,15 @@
 @extends('base.base')
 @section('content')
     @include('base.navbar')
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+            <ul class="list-disc ml-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <div class="max-w-2xl mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">
         <h2 class="text-2xl font-bold mb-4">Ringkasan Pembelian</h2>
@@ -24,7 +33,7 @@
             <p class="text-lg font-bold mt-2">Total: Rp{{ number_format($subtotal, 0, ',', '.') }}</p>
         </div>
 
-        <form method="POST" action="#" class="mt-6">
+        <form method="POST" action="{{ route('payment.process') }}" class="mt-6">
             @csrf
             <div class="mb-4">
                 <label class="font-medium block mb-2">Metode Pembayaran</label>
