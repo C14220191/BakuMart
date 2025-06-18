@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->integer('stock');
+            //make cant minus
+            $table->unsignedBigInteger('price');
+            $table->unsignedBigInteger('stock');
             $table->string('image')->default('images/products/dummy.png');
             $table->foreignId('admin_id')->constrained('users');
             $table->timestamps();

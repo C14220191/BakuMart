@@ -34,11 +34,10 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:1',
+            'stock' => 'required|integer|min:1',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
-        //if image is null, set it to a default image ('dummy.pnp')
         $imagePath = $request->hasFile('image')
             ? $request->file('image')->store('images/products', 'public')
             : 'images/products/dummy.png';
@@ -86,6 +85,13 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:1',
+            'stock' => 'required|integer|min:1',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
         Product::where('id', $id)->update([
             'name' => $request->name,
             'description' => $request->description,
