@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Dotenv\Util\Str;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
@@ -67,7 +68,7 @@ class OrderController extends Controller
             'success' => true,
             'redirect' => route('payment.index'),
         ]);
-    }   
+    }
 
     /**
      * Display the specified resource.
@@ -80,9 +81,10 @@ class OrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Order $order)
+    public function edit(String $id)
     {
         //
+        
     }
 
     /**

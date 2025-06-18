@@ -84,15 +84,24 @@
                 return;
             }
 
-            const exists = cartItems.find(p => p.id === product.id);
-            if (exists) {
-                alert("Product already in cart.");
-                return;
-            }
+            
+            fetch(`/api/products/${product.id}`)
+                .then(res => res.json())
+                .then(latestProduct => {
+                    const exists = cartItems.find(p => p.id === latestProduct.id);
+                    if (exists) {
+                        alert("Product already in cart.");
+                        return;
+                    }
 
-            product.qty = 1;
-            cartItems.push(product);
-            renderCart();
+                    latestProduct.qty = 1;
+                    cartItems.push(latestProduct);
+                    renderCart();
+                })
+                .catch(err => {
+                    console.error("Failed to fetch updated product:", err);
+                    alert("Unable to add product to cart.");
+                });
         }
 
         function removeFromCart(id) {

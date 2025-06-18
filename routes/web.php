@@ -20,10 +20,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
     Route::get('/payment', [OrderItemController::class, 'index'])->name('payment.index');
     Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
+    Route::get('/api/products/{id}', [ProductController::class, 'apiShow']);
+    Route::delete('/payment/destroy/{id}', [PaymentController::class, 'destroy'])->name('payment.cancel');
+
 
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/form', [ProductController::class, 'create'])->name('products.create');
         Route::post('/form', [ProductController::class, 'store'])->name('products.store');
         Route::resource('/products/manage', ProductController::class)->except(['create', 'store']);
+        Route::get('/products/edit/{id}', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('products.update');
     });
 });

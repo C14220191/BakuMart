@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\Product;
 
 class PaymentController extends Controller
 {
@@ -100,6 +102,16 @@ class PaymentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $order = Order::findOrFail($id);
+        $order->delete();
+        $orderItems = OrderItem::where('order_id', $id)->get();
+        foreach ($orderItems as $item) {
+            $product = Product::find($item->product_id);
+            if ($product) {
+                $product->increment('stock', $item->quantity);
+            }
+            $item->delete();
+        }
+        return redirect()->route('home')->with('success', 'Order berhasil dibatalkan.');
     }
 }

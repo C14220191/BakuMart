@@ -48,9 +48,20 @@
                 </label>
             </div>
             <button type="submit"
-                class="w-full bg-indigo-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition">
+                class="w-full bg-indigo-600 text-white py-3 rounded-lg text-lg font-semibold mb-2 hover:bg-indigo-700 transition">
                 Selesaikan Pembayaran
             </button>
         </form>
+
+        <form method="POST" action="{{ url('/payment/destroy/' . $item->order_id) }}" class="mt-2">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+                class="w-full bg-red-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-red-700 transition">
+                Cancel Order
+            </button>
+        </form>
+
+
     </div>
 @endsection

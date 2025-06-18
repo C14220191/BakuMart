@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,15 +13,16 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $listProducts = Product::all();
+        $listProducts = Product::orderBy('name', 'asc')->get();
         return view('products.index', [
             'listProducts' => $listProducts,
+
         ]);
     }
     public function create()
     {
         //
-        return view('products.form');
+        return view('products.form', ['mode' => 'add']);
     }
 
     /**
@@ -65,17 +67,36 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit(string $id)
+
     {
-        //
+        $product = Product::find($id);
+        if (!$product) {
+            return redirect()->route('products.index')->with('error', 'Product not found');
+        }
+        return view('products.form', [
+            'product' => $product,
+            'mode' => 'edit',
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, string $id)
     {
         //
+        Product::where('id', $id)->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'image' => $request->hasFile('image')
+                ? $request->file('image')->store('images/products', 'public')
+                : Product::find($id)->image,
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+        return redirect()->route('home');
     }
 
     /**
@@ -89,7 +110,7 @@ class ProductController extends Controller
     {
         Log::info('AJAX dipanggil', ['search' => $request->search]);
 
-        $query = Product::query();
+        $query = Product::query()->orderBy('id', 'asc');
 
         if ($request->has('search') && !empty($request->search)) {
             $search = strtolower($request->search);
@@ -114,5 +135,10 @@ class ProductController extends Controller
             'products' => $products->items(),
             'pagination' => (string) $products->appends(['search' => $request->search])->links(),
         ]);
+    }
+    public function apiShow($id)
+    {
+        $product = Product::findOrFail($id);
+        return response()->json($product);
     }
 }
