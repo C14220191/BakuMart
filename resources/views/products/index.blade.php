@@ -84,7 +84,7 @@
                 return;
             }
 
-            
+
             fetch(`/api/products/${product.id}`)
                 .then(res => res.json())
                 .then(latestProduct => {

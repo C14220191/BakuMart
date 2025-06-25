@@ -13,7 +13,8 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $listProducts = Product::orderBy('name', 'asc')->get();
+        //where stock > 0
+        $listProducts = Product::orderBy('name', 'asc')->where('stock', '>', 0)->get();
         return view('products.index', [
             'listProducts' => $listProducts,
 
@@ -52,7 +53,7 @@ class ProductController extends Controller
             'admin_id' => $adminId,
         ]);
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully');
+        return redirect()->route('home')->with('success', 'Product created successfully');
     }
 
     /**
@@ -114,9 +115,8 @@ class ProductController extends Controller
     }
     public function ajaxList(Request $request)
     {
-        Log::info('AJAX dipanggil', ['search' => $request->search]);
 
-        $query = Product::query()->orderBy('id', 'asc');
+        $query = Product::query()->orderBy('id', 'asc')->where('stock', '>', 0);
 
         if ($request->has('search') && !empty($request->search)) {
             $search = strtolower($request->search);

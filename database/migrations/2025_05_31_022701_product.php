@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            //make cant minus
             $table->unsignedBigInteger('price');
             $table->unsignedBigInteger('stock');
             $table->string('image')->default('images/products/dummy.png');

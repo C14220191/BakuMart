@@ -84,7 +84,7 @@ class OrderController extends Controller
     public function edit(String $id)
     {
         //
-        
+
     }
 
     /**
@@ -98,8 +98,19 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Order $order)
+    public function destroy(String $id)
     {
-        //
+        $order = Order::findOrFail($id);
+        $order->update(['status' => 'cancelled']);
+        $order->delete();
+        $orderItems = OrderItem::where('order_id', $id)->get();
+        foreach ($orderItems as $item) {
+            $product = Product::find($item->product_id);
+            if ($product) {
+                $product->increment('stock', $item->quantity);
+            }
+            $item->delete();
+        }
+        return redirect()->route('home')->with('success', 'Order berhasil dibatalkan.');
     }
 }

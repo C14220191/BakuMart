@@ -53,7 +53,7 @@
             </button>
         </form>
 
-        <form method="POST" action="{{ url('/payment/destroy/' . $item->order_id) }}" class="mt-2">
+        <form method="POST" action="{{ url('/order/destroy/' . $item->order_id) }}" class="mt-2">
             @csrf
             @method('DELETE')
             <button type="submit"

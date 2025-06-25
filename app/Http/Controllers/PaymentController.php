@@ -35,15 +35,19 @@ class PaymentController extends Controller
             return redirect()->route('home')->with('success', 'Pembayaran tunai berhasil.');
         }
 
+        $externalId = 'order-' . $latestOrder->id;
+        $successUrl = route('payment.store') . '?' . http_build_query([
+            'order_id' => $latestOrder->id,
+        ]);
+
         $response = Http::withBasicAuth(env('XENDIT_API_KEY'), '')
             ->post('https://api.xendit.co/v2/invoices', [
-                'external_id' => 'order-' . $latestOrder->id,
+                'external_id' => $externalId,
                 'payer_email' => Auth::user()->email ?? 'example@example.com',
                 'description' => 'Pembayaran BakuMart',
                 'amount' => $subtotal,
-                'success_redirect_url' => route('home'),
+                'success_redirect_url' => $successUrl,
             ]);
-
 
         if ($response->failed()) {
             Log::error('Xendit Error', [
@@ -53,9 +57,13 @@ class PaymentController extends Controller
             return back()->withErrors('Gagal membuat pembayaran cashless.');
         }
 
-        $invoiceUrl = $response->json()['invoice_url'];
-        return redirect($invoiceUrl);
+        $invoiceData = $response->json();
+        Log::info('Xendit Invoice Data', $invoiceData);
+        $latestOrder->update(['payment_proof' => $invoiceData['id']]);
+        return redirect($invoiceData['invoice_url']);
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -70,8 +78,34 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $orderId = $request->query('order_id');
+        $order = Order::find($orderId);
+        $invoicesId = $order->payment_proof;
+        Log::info('Masuk ke store pembayaran', [
+            'order_id' => $orderId,
+            'invoices_id' => $invoicesId,
+        ]);
+        $response = Http::withBasicAuth(env('XENDIT_API_KEY'), '')
+            ->get("https://api.xendit.co/v2/invoices/$invoicesId")->json();
+
+        Log::info('response valid, lanjut create');
+        Payment::create([
+            'order_id' => $order->id,
+            'amount' => $response['amount'],
+            'payment_status' => $response['status'],
+            'payment_proof' => $response['id'],
+            'payment_method' => $response['payment_method'] ?? 'unknown',
+            'payment_channel' => $response['payment_channel'] ?? 'unknown',
+        ]);
+        Log::info('invoice id', ['id' => $response['id']]);
+        $order->update(['status' => 'paid']);
+
+        return redirect()->route('home');
+        // return dd($response)
     }
+
+
+
 
     /**
      * Display the specified resource.
@@ -100,18 +134,5 @@ class PaymentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $order = Order::findOrFail($id);
-        $order->delete();
-        $orderItems = OrderItem::where('order_id', $id)->get();
-        foreach ($orderItems as $item) {
-            $product = Product::find($item->product_id);
-            if ($product) {
-                $product->increment('stock', $item->quantity);
-            }
-            $item->delete();
-        }
-        return redirect()->route('home')->with('success', 'Order berhasil dibatalkan.');
-    }
+    public function destroy(string $id) {}
 }

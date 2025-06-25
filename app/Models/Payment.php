@@ -10,7 +10,7 @@ class Payment extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['order_id', 'payment_date', 'amount', 'payment_status', 'payment_proof'];
+    protected $fillable = ['order_id', 'payment_date', 'amount', 'payment_status', 'payment_proof', 'payment_method', 'payment_channel'];
 
     public function order()
     {
