@@ -109,7 +109,6 @@ class UserController extends Controller
     public function adminDashboard() {
     $orders = Order::with('user')
         ->whereHas('user', function ($q) {
-            $q->where('role', '!=', 'admin');
         })
         ->orderBy('order_date', 'desc')
         ->get();
@@ -117,7 +116,7 @@ class UserController extends Controller
     $salesChart = DB::table('orders')
         ->select(DB::raw("TO_CHAR(order_date, 'Mon YYYY') as month"), DB::raw('SUM(total) as total_sales'))
         ->whereNotNull('order_date')
-        ->whereIn('status', ['paid', 'completed']) // Sesuaikan status sukses di sistem kamu
+        ->whereIn('status', ['paid', 'completed', 'paid_cash']) // Sesuaikan status sukses di sistem kamu
         ->groupBy(DB::raw("TO_CHAR(order_date, 'Mon YYYY')"))
         ->orderBy(DB::raw("MIN(order_date)"))
         ->get();

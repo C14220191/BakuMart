@@ -105,9 +105,19 @@ class ProductController extends Controller
         return redirect()->route('home');
     }
 
-    public function destroy(Product $product)
+    public function destroy(string $id)
     {
-        //
+        $product = Product::find($id);{
+        if (!$product) {
+            return redirect()->route('products.index')->with('error', 'Product not found');
+        }
+        if ($product->image && Storage::disk('public')->exists($product->image)) {
+            Storage::disk('public')->delete($product->image);
+        }
+        $product->delete();
+
+        return redirect()->route('products.manage');
+        }
     }
     public function ajaxList(Request $request)
     {
@@ -143,4 +153,9 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         return response()->json($product);
     }
+    public function manage() {
+    $products = Product::all();
+    return view('admin.manageproduct', compact('products'));
+    }
+
 }

@@ -36,5 +36,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/products/edit/{id}', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('products.update');
         Route::get('/admin/dashboard', [UserController::class, 'adminDashboard'])->name('admin.dashboard');
+        Route::get('/manage-product', [ProductController::class, 'manage'])->name('products.manage');
+        Route::get('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+        
     });
 });

@@ -48,7 +48,7 @@
                                 {{ ucwords($mode) }} Product
                             </button>
                             <p class="text-sm font-light text-gray-500">
-                                <a href="{{ route('home') }}" class="font-medium text-primary-600 hover:underline">Back to Products</a>
+                                <a href="{{ route('products.manage') }}" class="font-medium text-primary-600 hover:underline">Back to Products</a>
                             </p>
                         </form>
                     </div>
