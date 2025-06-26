@@ -18,11 +18,9 @@
         </div>
 
         <div id="paginationContainer" class="flex justify-center mt-6 space-x-2">
-            {{-- Link pagination muncul lewat AJAX --}}
         </div>
     </div>
 
-    {{-- Floating Cart --}}
     <div id="cartFloating"
         class="fixed right-4 bottom-4 w-80 bg-white shadow-lg rounded-lg p-4 border z-50 max-h-[500px] overflow-y-auto hidden">
         <h3 class="text-lg font-bold mb-2">Your Cart</h3>
@@ -34,7 +32,6 @@
             class="mt-2 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Checkout</button>
     </div>
 
-    {{-- Modal --}}
     <div id="productModal" onclick="closeModalOnBackground(event)"
         class="fixed inset-0 z-50 hidden bg-white/30 backdrop-blur-sm overflow-y-auto">
         <div class="relative p-4 w-full max-w-md mx-auto">
@@ -197,7 +194,12 @@
                         renderCart();
                         window.location.href = data.redirect;
                     } else {
-                        alert("Checkout failed.");
+                        if (data.message) {
+                            alert(data.message);
+                            window.location.href = data.redirect;
+                        } else {
+                            alert("Checkout failed.");
+                        }
                     }
                 })
                 .catch(err => {

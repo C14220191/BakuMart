@@ -34,6 +34,16 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        $order = Order::where('user_id', Auth::user()->id)
+            ->where('status', 'pending')
+            ->first();
+        if ($order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You already have a pending order. Please complete or cancel it before creating a new one.',
+                'redirect' => route('payment.index'),
+            ]);
+        }
 
         $request->validate([
             'items' => 'required|array',
@@ -45,6 +55,7 @@ class OrderController extends Controller
             return $item['price'] * $item['qty'];
         });
         $order = Order::create([
+
             'user_id' => Auth::user()->id,
             'order_date' => Carbon::now()->toDateString(),
             'status' => 'pending',

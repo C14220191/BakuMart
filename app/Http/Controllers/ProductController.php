@@ -13,7 +13,6 @@ class ProductController extends Controller
 {
     public function index()
     {
-        //where stock > 0
         $listProducts = Product::orderBy('name', 'asc')->where('stock', '>', 0)->get();
         return view('products.index', [
             'listProducts' => $listProducts,
@@ -106,9 +105,6 @@ class ProductController extends Controller
         return redirect()->route('home');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product)
     {
         //
