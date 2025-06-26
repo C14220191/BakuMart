@@ -24,7 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/products/{id}', [ProductController::class, 'apiShow']);
     Route::delete('/order/destroy/{id}', [OrderController::class, 'destroy'])->name('order.cancel');
     Route::get('/payment/success/', [PaymentController::class, 'store'])->name('payment.store');
-
+    Route::get('/LastOrders/{userId}', [OrderController::class, 'lastOrderUser'])->name('orders.lastOrders');
+    Route::get('/history', [OrderController::class, 'index'])->name('payment.history');
 
 
 

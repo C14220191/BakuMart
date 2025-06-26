@@ -10,20 +10,18 @@
 <body>
     <nav class="bg-[#43be37] px-4 py-3">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Kiri: Logo -->
-            <a href="#" class="text-white text-xl font-bold">BaKuMart</a>
-            <!-- Tengah (untuk menu desktop) -->
+            <a href="/" class="text-white text-xl font-bold">BaKuMart</a>
+
             <div class="hidden md:flex space-x-6">
                 <a href="/" class="hover:underline">Home</a>
-                <a href="/features" class="hover:underline">Features</a>
+                <a href="/history" class="hover:underline">History</a>
                 <a href="/pricing" class="hover:underline">Pricing</a>
-                
+
             </div>
             @auth
             <div class="hidden md:block relative">
                 <button id="user-menu-button" class="text-white focus:outline-none focus:ring-2 focus:ring-white">
                     welcome, {{ auth()->user()->name }}
-                    <!-- Icon: user -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
