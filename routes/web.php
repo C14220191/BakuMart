@@ -27,11 +27,13 @@ Route::middleware('auth')->group(function () {
 
 
 
+
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/form', [ProductController::class, 'create'])->name('products.create');
         Route::post('/form', [ProductController::class, 'store'])->name('products.store');
         Route::resource('/products/manage', ProductController::class)->except(['create', 'store']);
         Route::get('/products/edit/{id}', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('products.update');
+        Route::get('/admin/dashboard', [UserController::class, 'adminDashboard'])->name('admin.dashboard');
     });
 });

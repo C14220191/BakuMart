@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+
 
 class UserController extends Controller
 {
@@ -16,7 +19,7 @@ class UserController extends Controller
     {
         //
         return view('users.index', [
-            'listUsers' => \App\Models\User::all(),
+            'listUsers' => 'User' ::all(),
         ]);
     }
 
@@ -78,27 +81,48 @@ class UserController extends Controller
         //
     }
 
-    public function authenticate(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email:dns',
-            'password' => 'required|min:5',
-        ]);
+    public function authenticate(Request $request){
+    $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        // Redirect berdasarkan role
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
-
-        return back()->with([
-            'error' => 'The provided credentials do not match our records.',
-        ]);
+        return redirect()->route('home');
     }
+
+    return back()->withErrors([
+        'email' => 'Email atau password salah.',
+    ]);
+}
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
+    }
+
+    public function adminDashboard() {
+    $orders = Order::with('user')
+        ->whereHas('user', function ($q) {
+            $q->where('role', '!=', 'admin');
+        })
+        ->orderBy('order_date', 'desc')
+        ->get();
+
+    $salesChart = DB::table('orders')
+        ->select(DB::raw("TO_CHAR(order_date, 'Mon YYYY') as month"), DB::raw('SUM(total) as total_sales'))
+        ->whereNotNull('order_date')
+        ->whereIn('status', ['paid', 'completed']) // Sesuaikan status sukses di sistem kamu
+        ->groupBy(DB::raw("TO_CHAR(order_date, 'Mon YYYY')"))
+        ->orderBy(DB::raw("MIN(order_date)"))
+        ->get();
+
+    return view('admin.dashboard', compact('orders', 'salesChart'));
+
     }
 }

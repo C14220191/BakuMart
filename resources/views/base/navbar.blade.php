@@ -4,7 +4,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     @vite('resources/css/app.css')
 </head>
 
@@ -13,7 +12,6 @@
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <!-- Kiri: Logo -->
             <a href="#" class="text-white text-xl font-bold">BaKuMart</a>
-
             <!-- Tengah (untuk menu desktop) -->
             <div class="hidden md:flex space-x-6">
                 <a href="/" class="hover:underline">Home</a>
@@ -21,7 +19,6 @@
                 <a href="/pricing" class="hover:underline">Pricing</a>
                 
             </div>
-
             @auth
             <div class="hidden md:block relative">
                 <button id="user-menu-button" class="text-white focus:outline-none focus:ring-2 focus:ring-white">
@@ -36,11 +33,20 @@
                 <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
+
+                    @if (Auth::user()->role === 'admin')
+                        <a href="{{ url('/admin/dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                            Dashboard Admin
+                        </a>
+                    @endif
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit"
-                            class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">Logout</button>
+                        <button type="submit" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">
+                            Logout
+                        </button>
                     </form>
+                </div>
                 </div>
                 <script>
                     document.getElementById('user-menu-button').addEventListener('click', function() {
@@ -54,9 +60,6 @@
                 <a href="{{ route('login') }}" class="text-white hover:underline">Login</a>
             </div>
             @endauth
-            <!-- Kanan: Login -->
-
-            <!-- Mobile menu button -->
             <div class="md:hidden">
                 <button id="menu-button" class="text-white focus:outline-none focus:ring-2 focus:ring-white">
                     <!-- Icon: hamburger -->
