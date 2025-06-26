@@ -18,8 +18,13 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $listOrders = Order::with('orderItems.product')->where('user_id', Auth::id())->get();
+
+        return view('payment.history', [
+            'orders' => $listOrders,
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

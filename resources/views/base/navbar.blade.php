@@ -51,9 +51,6 @@
                 <a href="{{ route('login') }}" class="text-white hover:underline">Login</a>
             </div>
             @endauth
-            <!-- Kanan: Login -->
-
-            <!-- Mobile menu button -->
             <div class="md:hidden">
                 <button id="menu-button" class="text-white focus:outline-none focus:ring-2 focus:ring-white">
                     <!-- Icon: hamburger -->
