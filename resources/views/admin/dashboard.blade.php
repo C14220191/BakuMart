@@ -20,6 +20,17 @@
         <canvas id="salesChart" height="100"></canvas>
 
         <h3>Data Penjualan User</h3>
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder=" Cari Nama User.." value="{{ request('search') }}">
+                <div class="input-group-append">
+                    <button 
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" type="submit" type="submit">Search User
+                </button>
+                </div>
+            </div>
+        </form>
+
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>

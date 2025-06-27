@@ -26,10 +26,7 @@
             class="w-full md:w-1/3 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
         <button
-            type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-            Search Product
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" type="submit" > Search Product
         </button>
     </form>
 
