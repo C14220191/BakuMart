@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\CheckPendingOrder;
 use App\Http\Middleware\Role;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -28,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('user', fn(User $user) => $user->role == 'user');
         Gate::define('admin', fn(User $user) => $user->role == 'admin');
-
         Route::aliasMiddleware('role', Role::class);
+        Route::aliasMiddleware('check.pending.order', CheckPendingOrder::class);
     }
 }

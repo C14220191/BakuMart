@@ -8,16 +8,36 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $listProducts = Product::orderBy('name', 'asc')->where('stock', '>', 0)->get();
+        // $listProducts = Product::orderBy('name', 'asc')->where('stock', '>', 0)->get();
+        // return view('products.index', [
+        //     'listProducts' => $listProducts,
+        // ]);
+    }
+    public function newProduct()
+    {
+        $lastProducts = Product::orderBy('id', 'asc')->take(5)->get();
+        $bestSelling = $this->bestSellingProducts();
         return view('products.index', [
-            'listProducts' => $listProducts,
-
+            'lastProducts' => $lastProducts,
+            'bestSelling' => $bestSelling,
         ]);
+    }
+    public function bestSellingProducts()
+    {
+        $bestSelling = Product::select('products.*', DB::raw('SUM(order_items.quantity) as total_sold'))
+            ->join('order_items', 'products.id', '=', 'order_items.product_id')
+            ->groupBy('products.id')
+            ->orderByDesc('total_sold')
+            ->take(5)
+            ->get();
+
+        return $bestSelling;
     }
     public function create()
     {
@@ -115,16 +135,27 @@ class ProductController extends Controller
         return redirect()->route('products.manage');
     }
 
+
     public function ajaxList(Request $request)
     {
+        $filter = $request->query('filter');
 
-        $query = Product::query()->orderBy('id', 'asc')->where('stock', '>', 0);
+        if ($filter === 'low') {
+            $query = Product::query()->orderBy('price', 'asc')->where('stock', '>', 0);
+        } else if ($filter === 'high') {
+            $query = Product::query()->orderBy('price', 'desc')->where('stock', '>', 0);
+        } else if ($filter === 'asc') {
+            $query = Product::query()->orderBy('name', 'asc')->where('stock', '>', 0);
+        } else if ($filter === 'desc') {
+            $query = Product::query()->orderBy('name', 'desc')->where('stock', '>', 0);
+        } else {
+            $query = Product::query()->orderBy('id', 'asc')->where('stock', '>', 0);
+        }
 
         if ($request->has('search') && !empty($request->search)) {
             $search = strtolower($request->search);
             $query->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
         }
-
 
         $products = $query->paginate(15);
 
@@ -141,17 +172,21 @@ class ProductController extends Controller
 
         return response()->json([
             'products' => $products->items(),
-            'pagination' => (string) $products->appends(['search' => $request->search])->links(),
+            'pagination' => (string) $products->appends([
+                'search' => $request->search,
+                'filter' => $filter
+            ])->links(),
         ]);
     }
+
     public function apiShow($id)
     {
         $product = Product::findOrFail($id);
         return response()->json($product);
     }
-    public function manage() {
-    $products = Product::all();
-    return view('admin.manageproduct', compact('products'));
+    public function manage()
+    {
+        $products = Product::all();
+        return view('admin.manageproduct', compact('products'));
     }
-
 }

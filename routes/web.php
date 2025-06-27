@@ -8,7 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Models\Order;
 
-Route::get('/', [ProductController::class, 'index'])->name('home');
+Route::get('/', [ProductController::class, 'newProduct'])->name('home');
 Route::get('/products/list', [ProductController::class, 'ajaxList'])->name('products.ajaxList');
 
 Route::get('/login', fn() => view('login'))->name('login');
@@ -19,7 +19,7 @@ Route::post('/register', [UserController::class, 'store'])->name('register');
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
     Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
-    Route::get('/payment', [OrderItemController::class, 'index'])->name('payment.index');
+    Route::get('/payment', [OrderItemController::class, 'index'])->name('payment.index')->middleware(['check.pending.order']);
     Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
     Route::get('/api/products/{id}', [ProductController::class, 'apiShow']);
     Route::delete('/order/destroy/{id}', [OrderController::class, 'destroy'])->name('order.cancel');

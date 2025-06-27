@@ -18,7 +18,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Product 1',
                 'description' => 'Description for Product 1',
-                'admin_id' => 1, // Assuming admin_id is required and 1 is a valid admin ID
+                'admin_id' => 1,
                 'price' => 10000,
                 'stock' => 10,
                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),

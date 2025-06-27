@@ -15,7 +15,6 @@
             <div class="hidden md:flex space-x-6">
                 <a href="/" class="hover:underline">Home</a>
                 <a href="/history" class="hover:underline">History</a>
-                <a href="/pricing" class="hover:underline">Pricing</a>
 
             </div>
             @auth
@@ -29,9 +28,6 @@
                     </svg>
                 </button>
                 <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
-                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
-
                     @if (Auth::user()->role === 'admin')
                         <a href="{{ url('/admin/dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                             Dashboard Admin
@@ -79,9 +75,8 @@
 
         <!-- Mobile menu (hidden by default) -->
         <div id="mobile-menu" class="md:hidden hidden px-4 mt-2 space-y-2">
-            <a href="#" class="block text-white hover:underline">Home</a>
-            <a href="#" class="block text-white hover:underline">Features</a>
-            <a href="#" class="block text-white hover:underline">Pricing</a>
+            <a href="{{ route('home') }}" class="block text-white hover:underline">Home</a>
+            <a href="{{ route('payment.history') }}" class="block text-white hover:underline">History</a>
             <a href="{{ route('login') }}" class="block text-white hover:underline">Login</a>
         </div>
     </nav>

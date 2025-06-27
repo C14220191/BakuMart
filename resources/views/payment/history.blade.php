@@ -11,11 +11,11 @@
         @else
             <div class="space-y-6">
                 @foreach ($orders as $order)
+
                     @php
                         $firstItem = $order->orderItems->first();
                         $otherItemCount = $order->orderItems->count() - 1;
                     @endphp
-
                     <div
                         class="bg-white rounded-lg shadow-md p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex gap-4 items-start sm:items-center w-full sm:w-auto">
@@ -47,5 +47,6 @@
                 @endforeach
             </div>
         @endif
+        {{ $orders->links() }}
     </div>
 @endsection

@@ -19,7 +19,7 @@ class UserController extends Controller
     {
         //
         return view('users.index', [
-            'listUsers' => 'User' ::all(),
+            'listUsers' => 'User'::all(),
         ]);
     }
 
@@ -81,23 +81,24 @@ class UserController extends Controller
         //
     }
 
-    public function authenticate(Request $request){
-    $credentials = $request->only('email', 'password');
+    public function authenticate(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-        // Redirect berdasarkan role
-        if (auth()->user()->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+            // Redirect berdasarkan role
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect()->route('home');
         }
-        return redirect()->route('home');
-    }
 
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ]);
-}
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ]);
+    }
     public function logout(Request $request)
     {
         Auth::logout();
@@ -106,22 +107,21 @@ class UserController extends Controller
         return redirect('/login');
     }
 
-    public function adminDashboard() {
-    $orders = Order::with('user')
-        ->whereHas('user', function ($q) {
-        })
-        ->orderBy('order_date', 'desc')
-        ->get();
+    public function adminDashboard()
+    {
+        $orders = Order::with('user')
+            ->whereHas('user', function ($q) {})
+            ->orderBy('order_date', 'desc')
+            ->get();
 
-    $salesChart = DB::table('orders')
-        ->select(DB::raw("TO_CHAR(order_date, 'Mon YYYY') as month"), DB::raw('SUM(total) as total_sales'))
-        ->whereNotNull('order_date')
-        ->whereIn('status', ['paid', 'completed', 'paid_cash']) // Sesuaikan status sukses di sistem kamu
-        ->groupBy(DB::raw("TO_CHAR(order_date, 'Mon YYYY')"))
-        ->orderBy(DB::raw("MIN(order_date)"))
-        ->get();
+        $salesChart = DB::table('orders')
+            ->select(DB::raw("TO_CHAR(order_date, 'Mon YYYY') as month"), DB::raw('SUM(total) as total_sales'))
+            ->whereNotNull('order_date')
+            ->whereIn('status', ['paid', 'completed', 'paid_cash']) // Sesuaikan status sukses di sistem kamu
+            ->groupBy(DB::raw("TO_CHAR(order_date, 'Mon YYYY')"))
+            ->orderBy(DB::raw("MIN(order_date)"))
+            ->get();
 
-    return view('admin.dashboard', compact('orders', 'salesChart'));
-
+        return view('admin.dashboard', compact('orders', 'salesChart'));
     }
 }
