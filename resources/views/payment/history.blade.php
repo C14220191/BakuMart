@@ -40,7 +40,7 @@
                                 {{ $order->status }}
                             </span>
                             <div class="mt-2">
-                                <a href="#" class="text-blue-600 hover:underline text-sm">Lihat Detail</a>
+                                <a href="{{ route('payment.detail', $order->id) }}" class="text-blue-600 hover:underline text-sm">Detail</a>
                             </div>
                         </div>
                     </div>

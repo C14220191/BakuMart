@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/success/', [PaymentController::class, 'store'])->name('payment.store');
     Route::get('/LastOrders/{userId}', [OrderController::class, 'lastOrderUser'])->name('orders.lastOrders');
     Route::get('/history', [OrderController::class, 'index'])->name('payment.history');
+    Route::get('/payment/detail/{id}', [OrderController::class, 'show'])->name('payment.detail');
 
 
 
@@ -38,6 +39,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/dashboard', [UserController::class, 'adminDashboard'])->name('admin.dashboard');
         Route::get('/manage-product', [ProductController::class, 'manage'])->name('products.manage');
         Route::get('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-        
+
     });
 });

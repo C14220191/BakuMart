@@ -89,9 +89,12 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show(String $id)
     {
-        //
+        $order = Order::with('orderItems.product', 'payment')->findOrFail($id);
+        return view('payment.detail', [
+            'order' => $order,
+        ]);
     }
 
     /**

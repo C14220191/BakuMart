@@ -107,18 +107,14 @@ class ProductController extends Controller
 
     public function destroy(string $id)
     {
-        $product = Product::find($id);{
+        $product = Product::find($id);
         if (!$product) {
             return redirect()->route('products.index')->with('error', 'Product not found');
         }
-        if ($product->image && Storage::disk('public')->exists($product->image)) {
-            Storage::disk('public')->delete($product->image);
-        }
         $product->delete();
-
         return redirect()->route('products.manage');
-        }
     }
+
     public function ajaxList(Request $request)
     {
 
