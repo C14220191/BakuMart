@@ -107,21 +107,29 @@ class UserController extends Controller
         return redirect('/login');
     }
 
-    public function adminDashboard()
-    {
-        $orders = Order::with('user')
-            ->whereHas('user', function ($q) {})
-            ->orderBy('order_date', 'desc')
-            ->get();
+    public function adminDashboard(Request $request) {
+    $search = $request->input('search');
+    $orders = Order::with('user')
+        ->whereIn('status', ['paid', 'completed', 'paid_cash'])
+        ->whereHas('user', function ($q) use ($search) {
+            if ($search) {
+                $q->where('name', 'ILIKE', "%$search%");
+            }
+        })
+        ->orderBy('order_date', 'desc')
+        ->paginate(10);
 
-        $salesChart = DB::table('orders')
-            ->select(DB::raw("TO_CHAR(order_date, 'Mon YYYY') as month"), DB::raw('SUM(total) as total_sales'))
-            ->whereNotNull('order_date')
-            ->whereIn('status', ['paid', 'completed', 'paid_cash']) // Sesuaikan status sukses di sistem kamu
-            ->groupBy(DB::raw("TO_CHAR(order_date, 'Mon YYYY')"))
-            ->orderBy(DB::raw("MIN(order_date)"))
-            ->get();
+    $salesChart = DB::table('orders')
+        ->select(DB::raw("TO_CHAR(order_date, 'Mon YYYY') as month"), DB::raw('SUM(total) as total_sales'))
+        ->whereNotNull('order_date')
+        ->whereIn('status', ['paid', 'completed', 'paid_cash']) // Sesuaikan status sukses di sistem kamu
+        ->groupBy(DB::raw("TO_CHAR(order_date, 'Mon YYYY')"))
+        ->orderBy(DB::raw("MIN(order_date)"))
+        ->get();
 
-        return view('admin.dashboard', compact('orders', 'salesChart'));
+    return view('admin.dashboard', compact('orders', 'salesChart'));
+
     }
+
+
 }

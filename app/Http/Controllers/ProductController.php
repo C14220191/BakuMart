@@ -184,9 +184,20 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         return response()->json($product);
     }
-    public function manage()
-    {
-        $products = Product::all();
-        return view('admin.manageproduct', compact('products'));
+    public function manage(Request $request) {
+    $query = Product::query();
+    if ($request->filled('search')) {
+        $query->where('name', 'ILIKE', '%' . $request->search . '%'); // ILIKE untuk PostgreSQL case-insensitive
+    }
+
+    $sort = $request->get('sort', 'name');
+    $order = $request->get('order', 'asc');
+    if (in_array($sort, ['name', 'price', 'stock']) && in_array($order, ['asc', 'desc'])) {
+        $query->orderBy($sort, $order);
+    }
+
+    $products = $query->paginate(10)->withQueryString();
+
+    return view('admin.manageproduct', compact('products'));
     }
 }
