@@ -18,7 +18,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $listOrders = Order::with('orderItems.product')->where('user_id', Auth::id())->paginate(10);
+        $listOrders = Order::with('orderItems.product')->where('user_id', Auth::id())->orderBy('id', 'desc')->paginate(10);
 
         return view('payment.history', [
             'orders' => $listOrders,

@@ -36,7 +36,6 @@
             @php
                 $subtotal = $order->orderItems->sum(fn($i) => $i->quantity * $i->price);
                 $total = $order->total;
-                $diskonBarang = $subtotal - $total;
             @endphp
 
             <ul class="text-sm text-gray-700 space-y-1">
@@ -44,12 +43,6 @@
                     <span>Subtotal Harga Barang</span>
                     <span>Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
                 </li>
-                @if ($diskonBarang > 0)
-                    <li class="flex justify-between">
-                        <span>Diskon</span>
-                        <span class="text-red-600">-Rp{{ number_format($diskonBarang, 0, ',', '.') }}</span>
-                    </li>
-                @endif
             </ul>
 
             <hr class="my-3">
