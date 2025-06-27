@@ -21,7 +21,7 @@ class ProductController extends Controller
     }
     public function newProduct()
     {
-        $lastProducts = Product::orderBy('id', 'asc')->take(5)->get();
+        $lastProducts = Product::orderBy('id', 'desc')->take(5)->get();
         $bestSelling = $this->bestSellingProducts();
         return view('products.index', [
             'lastProducts' => $lastProducts,
