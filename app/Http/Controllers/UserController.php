@@ -108,10 +108,8 @@ class UserController extends Controller
 
     public function adminDashboard() {
     $orders = Order::with('user')
-        ->whereHas('user', function ($q) {
-        })
         ->orderBy('order_date', 'desc')
-        ->get();
+        ->paginate(10); // Tambahkan pagination di sini
 
     $salesChart = DB::table('orders')
         ->select(DB::raw("TO_CHAR(order_date, 'Mon YYYY') as month"), DB::raw('SUM(total) as total_sales'))
@@ -122,6 +120,6 @@ class UserController extends Controller
         ->get();
 
     return view('admin.dashboard', compact('orders', 'salesChart'));
-
     }
+
 }
