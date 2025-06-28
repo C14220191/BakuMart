@@ -87,7 +87,6 @@ class ProductController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-
     {
         $product = Product::find($id);
         if (!$product) {
@@ -186,7 +185,19 @@ class ProductController extends Controller
     }
     public function manage()
     {
-        $products = Product::all();
+        $query = Product::query();
+        $request = request();
+        if ($request->filled('search')) {
+            $query->where('name', 'ILIKE', '%' . $request->search . '%'); // ILIKE untuk PostgreSQL case-insensitive
+        }
+
+        $sort = $request->get('sort', 'name');
+        $order = $request->get('order', 'asc');
+        if (in_array($sort, ['name', 'price', 'stock']) && in_array($order, ['asc', 'desc'])) {
+            $query->orderBy($sort, $order);
+        }
+
+        $products = $query->paginate(10)->withQueryString();
         return view('admin.manageproduct', compact('products'));
     }
 }
